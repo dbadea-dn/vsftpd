@@ -791,7 +791,7 @@ str_basename (struct mystr* d_str, const struct mystr* path)
 void
 str_normalize_filepath(struct mystr* filepath)
 {
-    char *path;
+    const char *path;
     char *normdir;
     char *dir;
     char *filename;
@@ -840,7 +840,7 @@ str_normalize_filepath(struct mystr* filepath)
     free(normdir);
     str_free(&tmp);
 out:
-    free(path);
+    free((void*)path);
     free(ch1);
     free(ch2);
 }
