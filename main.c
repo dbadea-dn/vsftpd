@@ -98,7 +98,7 @@ main(int argc, const char* argv[])
     {
       if (p_arg[1] == 'v')
       {
-        vsf_exit("vsftpd: version " VSF_VERSION "\n");
+        vsf_exit("vsftpd: version " VSF_VERSION "-dn\n");
       }
       else if (p_arg[1] == 'o')
       {
