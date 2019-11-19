@@ -242,7 +242,8 @@ void vsf_remove_uwtmp(void);
 int
 vsf_sysdep_check_auth(struct mystr* p_user_str,
                       const struct mystr* p_pass_str,
-                      const struct mystr* p_remote_host)
+                      const struct mystr* p_remote_host,
+                      unsigned short remote_port)
 {
   const char* p_crypted;
   const struct passwd* p_pwd = getpwnam(str_getbuf(p_user_str));
@@ -322,7 +323,8 @@ static void vsf_auth_shutdown(void);
 int
 vsf_sysdep_check_auth(struct mystr* p_user_str,
                       const struct mystr* p_pass_str,
-                      const struct mystr* p_remote_host)
+                      const struct mystr* p_remote_host,
+                      unsigned short remote_port)
 {
   int retval = -1;
   pam_item_t item;
@@ -348,12 +350,21 @@ vsf_sysdep_check_auth(struct mystr* p_user_str,
     return 0;
   }
 #ifdef PAM_RHOST
-  retval = pam_set_item(s_pamh, PAM_RHOST, str_getbuf(p_remote_host));
-  if (retval != PAM_SUCCESS)
   {
-    (void) pam_end(s_pamh, retval);
-    s_pamh = 0;
-    return 0;
+    struct mystr remote_addr = INIT_MYSTR;
+
+    str_copy(&remote_addr, p_remote_host);
+    str_append_text(&remote_addr, " ");
+    str_append_ulong(&remote_addr, (unsigned long)remote_port);
+
+    retval = pam_set_item(s_pamh, PAM_RHOST, str_getbuf(&remote_addr));
+    str_free(&remote_addr);
+    if (retval != PAM_SUCCESS)
+    {
+      (void) pam_end(s_pamh, retval);
+      s_pamh = 0;
+      return 0;
+    }
   }
 #endif
 #ifdef PAM_TTY

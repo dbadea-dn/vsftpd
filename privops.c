@@ -384,7 +384,10 @@ handle_local_login(struct vsf_session* p_sess,
                    struct mystr* p_user_str,
                    const struct mystr* p_pass_str)
 {
-  if (!vsf_sysdep_check_auth(p_user_str, p_pass_str, &p_sess->remote_ip_str))
+  unsigned short remote_port;
+
+  remote_port = vsf_sysutil_sockaddr_get_port(p_sess->p_remote_addr);
+  if (!vsf_sysdep_check_auth(p_user_str, p_pass_str, &p_sess->remote_ip_str, remote_port))
   {
     return kVSFLoginFail;
   }

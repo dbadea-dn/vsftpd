@@ -17,7 +17,8 @@ struct mystr;
 /* Return 0 for fail, 1 for success */
 int vsf_sysdep_check_auth(struct mystr* p_user,
                           const struct mystr* p_pass,
-                          const struct mystr* p_remote_host);
+                          const struct mystr* p_remote_host,
+                          unsigned short remote_port);
 
 /* Support for fine grained privilege (capabilities) */
 int vsf_sysdep_has_capabilities(void);
