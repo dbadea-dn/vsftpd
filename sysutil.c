@@ -2718,6 +2718,28 @@ vsf_sysutil_get_time_usec(void)
   return s_current_time.tv_usec;
 }
 
+int vsf_sysutil_get_monotonic_clock(unsigned long* p_sec,\
+                                    unsigned long* p_nsec)
+{
+  struct timespec ts;
+  int retval;
+
+  retval = clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+  if (retval == -1)
+  {
+    return retval;
+  }
+  if (p_sec != 0)
+  {
+    *p_sec = ts.tv_sec;
+  }
+  if (p_nsec != 0)
+  {
+    *p_nsec = ts.tv_nsec;
+  }
+  return retval;
+}
+
 void
 vsf_sysutil_qsort(void* p_base, unsigned int num_elem, unsigned int elem_size,
                   int (*p_compar)(const void *, const void *))

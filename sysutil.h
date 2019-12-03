@@ -348,6 +348,7 @@ long vsf_sysutil_get_time_usec(void);
 long vsf_sysutil_parse_time(const char* p_text);
 void vsf_sysutil_sleep(double seconds);
 int vsf_sysutil_setmodtime(const char* p_file, long the_time, int is_localtime);
+int vsf_sysutil_get_monotonic_clock(unsigned long *p_sec, unsigned long* p_nsec);
 
 /* Limits */
 void vsf_sysutil_set_address_space_limit(unsigned long bytes);
