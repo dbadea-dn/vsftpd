@@ -108,6 +108,7 @@ parseconf_bool_array[] =
   { "seccomp_sandbox", &tunable_seccomp_sandbox },
   { "allow_writeable_chroot", &tunable_allow_writeable_chroot },
   { "allow_root_squashed_chroot", &tunable_allow_root_squashed_chroot },
+  { "events_enable", &tunable_events_enable },
   { 0, 0 }
 };
 
@@ -181,6 +182,7 @@ parseconf_str_array[] =
   { "dsa_private_key_file", &tunable_dsa_private_key_file },
   { "ca_certs_file", &tunable_ca_certs_file },
   { "cmds_denied", &tunable_cmds_denied },
+  { "events_socket_path", &tunable_events_socket_path },
   { 0, 0 }
 };
 

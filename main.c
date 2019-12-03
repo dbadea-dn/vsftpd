@@ -54,7 +54,7 @@ main(int argc, const char* argv[])
     /* Pre-chroot() cache */
     INIT_MYSTR, INIT_MYSTR, INIT_MYSTR, INIT_MYSTR, 1,
     /* Logging */
-    -1, -1, INIT_MYSTR, 0, 0, 0, INIT_MYSTR, 0,
+    -1, -1, -1, INIT_MYSTR, 0, 0, 0, INIT_MYSTR, 0,
     /* Buffers */
     INIT_MYSTR, INIT_MYSTR,
     /* Parent <-> child comms */
@@ -183,6 +183,10 @@ main(int argc, const char* argv[])
    * address to convert into text
    */
   vsf_log_init(&the_session);
+  if (tunable_events_enable)
+  {
+    vsf_event_init(&the_session);
+  }
   str_alloc_text(&the_session.remote_ip_str,
                  vsf_sysutil_inet_ntop(the_session.p_remote_addr));
   /* Set up options on the command socket */

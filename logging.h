@@ -22,6 +22,11 @@ enum EVSFLogEntryType
   kVSFLogEntryDebug,
 };
 
+enum EVSFEventType
+{
+  kVSFEventNop = 0,
+};
+
 /* vsf_log_init()
  * PURPOSE
  * Initialize the logging services, by opening a writable file descriptor to
@@ -79,6 +84,10 @@ void vsf_log_do_log(struct vsf_session* p_sess, int succeeded);
  */
 void vsf_log_line(struct vsf_session* p_sess, enum EVSFLogEntryType what,
                   struct mystr* p_str);
+
+void vsf_event_init(struct vsf_session* p_sess);
+void vsf_event_trigger(struct vsf_session* p_sess, enum EVSFEventType what,
+                       const struct mystr* p_str);
 
 #endif /* VSF_LOGGING_H */
 

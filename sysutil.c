@@ -55,6 +55,7 @@
 #include <utime.h>
 #include <netdb.h>
 #include <sys/resource.h>
+#include <sys/un.h>
 
 /* Private variables to this file */
 /* Current umask() */
@@ -89,6 +90,7 @@ struct vsf_sysutil_sockaddr
     struct sockaddr u_sockaddr;
     struct sockaddr_in u_sockaddr_in;
     struct sockaddr_in6 u_sockaddr_in6;
+    struct sockaddr_un u_sockaddr_un;
   } u;
 };
 
@@ -1633,6 +1635,17 @@ vsf_sysutil_get_ipv6_sock(void)
   return retval;
 }
 
+int
+vsf_sysutil_get_unix_sock(void)
+{
+  int retval = socket(AF_UNIX, SOCK_DGRAM, 0);
+  if (retval < 0)
+  {
+    die("socket");
+  }
+  return retval;
+}
+
 struct vsf_sysutil_socketpair_retval
 vsf_sysutil_unix_stream_socketpair(void)
 {
@@ -1660,6 +1673,10 @@ vsf_sysutil_bind(int fd, const struct vsf_sysutil_sockaddr* p_sockptr)
   else if (p_sockaddr->sa_family == AF_INET6)
   {
     len = sizeof(struct sockaddr_in6);
+  }
+  else if (p_sockaddr->sa_family == AF_UNIX)
+  {
+    len = sizeof(struct sockaddr_un);
   }
   else
   {
@@ -1768,6 +1785,10 @@ vsf_sysutil_connect_timeout(int fd, const struct vsf_sysutil_sockaddr* p_addr,
   else if (p_sockaddr->sa_family == AF_INET6)
   {
     addrlen = sizeof(p_addr->u.u_sockaddr_in6);
+  }
+  else if (p_sockaddr->sa_family == AF_UNIX)
+  {
+    addrlen = sizeof(p_addr->u.u_sockaddr_un);
   }
   else
   {
@@ -1923,6 +1944,13 @@ vsf_sysutil_sockaddr_alloc_ipv6(struct vsf_sysutil_sockaddr** p_sockptr)
 {
   vsf_sysutil_sockaddr_alloc(p_sockptr);
   (*p_sockptr)->u.u_sockaddr.sa_family = AF_INET6;
+}
+
+void
+vsf_sysutil_sockaddr_alloc_un(struct vsf_sysutil_sockaddr** p_sockptr)
+{
+  vsf_sysutil_sockaddr_alloc(p_sockptr);
+  (*p_sockptr)->u.u_sockaddr_un.sun_family = AF_UNIX;
 }
 
 void
@@ -2101,6 +2129,34 @@ vsf_sysutil_sockaddr_get_raw_addr(struct vsf_sysutil_sockaddr* p_sockptr)
     bug("bad family");
   }
   return 0;
+}
+
+void
+vsf_sysutil_sockaddr_set_un_path(struct vsf_sysutil_sockaddr* p_addr, const struct mystr* path, int is_private)
+{
+  unsigned int len;
+  char *sun_path;
+
+  if (p_addr->u.u_sockaddr.sa_family != AF_UNIX)
+  {
+    return;
+  }
+  len = sizeof(p_addr->u.u_sockaddr_un.sun_path)-1;
+  if (is_private)
+  {
+    len -= 1;
+  }
+  if (len > str_getlen(path))
+  {
+    len = str_getlen(path);
+  }
+  sun_path = p_addr->u.u_sockaddr_un.sun_path;
+  if (is_private)
+  {
+    sun_path[0] = 0;
+    sun_path += 1;
+  }
+  vsf_sysutil_strcpy(sun_path, str_getbuf(path), len+1);
 }
 
 unsigned int
@@ -2860,3 +2916,27 @@ vsf_sysutil_post_fork()
     s_sig_details[i].pending = 0;
   }
 }
+
+int vsf_sysutil_sendto(const int fd, const void* p_buf, const unsigned int size,
+                      struct vsf_sysutil_sockaddr* where)
+{
+  if (where->u.u_sockaddr.sa_family != AF_UNIX)
+  {
+    errno = EINVAL;
+    return -1;
+  }
+  while (1)
+  {
+    int retval = sendto(fd, p_buf, size, 0,
+                        &where->u.u_sockaddr,
+                        sizeof(struct sockaddr_un));
+    int saved_errno = errno;
+    vsf_sysutil_check_pending_actions(kVSFSysUtilIO, retval, fd);
+    if (retval < 0 && saved_errno == EINTR)
+    {
+      continue;
+    }
+    return retval;
+  }
+}
+

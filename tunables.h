@@ -90,6 +90,7 @@ extern int tunable_http_enable;               /* Allow HTTP protocol */
 extern int tunable_seccomp_sandbox;           /* seccomp filter sandbox */
 extern int tunable_allow_writeable_chroot;    /* Allow misconfiguration */
 extern int tunable_allow_root_squashed_chroot;/* Allow chroot on squashed root nfs */
+extern int tunable_events_enable;             /* Generate server events */
 
 /* Integer/numeric defines */
 extern unsigned int tunable_accept_timeout;
@@ -147,6 +148,7 @@ extern const char* tunable_rsa_private_key_file;
 extern const char* tunable_dsa_private_key_file;
 extern const char* tunable_ca_certs_file;
 extern const char* tunable_cmds_denied;
+extern const char* tunable_events_socket_path;
 
 #endif /* VSF_TUNABLES_H */
 

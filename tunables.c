@@ -89,6 +89,7 @@ int tunable_http_enable;
 int tunable_seccomp_sandbox;
 int tunable_allow_writeable_chroot;
 int tunable_allow_root_squashed_chroot;
+int tunable_events_enable;
 
 unsigned int tunable_accept_timeout;
 unsigned int tunable_connect_timeout;
@@ -144,6 +145,7 @@ const char* tunable_ssl_ciphers;
 const char* tunable_rsa_private_key_file;
 const char* tunable_dsa_private_key_file;
 const char* tunable_ca_certs_file;
+const char* tunable_events_socket_path;
 
 static void install_str_setting(const char* p_value, const char** p_storage);
 
@@ -231,6 +233,7 @@ tunables_load_defaults()
   tunable_seccomp_sandbox = 1;
   tunable_allow_writeable_chroot = 0;
   tunable_allow_root_squashed_chroot = 0;
+  tunable_events_enable = 0;
 
   tunable_accept_timeout = 60;
   tunable_connect_timeout = 60;
@@ -292,6 +295,7 @@ tunables_load_defaults()
   install_str_setting(0, &tunable_rsa_private_key_file);
   install_str_setting(0, &tunable_dsa_private_key_file);
   install_str_setting(0, &tunable_ca_certs_file);
+  install_str_setting("/var/run/vsftpd_events.sock", &tunable_events_socket_path);
 }
 
 void

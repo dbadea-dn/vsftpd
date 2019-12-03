@@ -6,6 +6,7 @@
 #ifndef VSF_FILESIZE_H
 #include "filesize.h"
 #endif
+#include "str.h"
 
 /* Return value queries */
 int vsf_sysutil_retval_is_error(int retval);
@@ -217,6 +218,7 @@ void vsf_sysutil_sockaddr_alloc(struct vsf_sysutil_sockaddr** p_sockptr);
 void vsf_sysutil_sockaddr_clear(struct vsf_sysutil_sockaddr** p_sockptr);
 void vsf_sysutil_sockaddr_alloc_ipv4(struct vsf_sysutil_sockaddr** p_sockptr);
 void vsf_sysutil_sockaddr_alloc_ipv6(struct vsf_sysutil_sockaddr** p_sockptr);
+void vsf_sysutil_sockaddr_alloc_un(struct vsf_sysutil_sockaddr** p_sockptr);
 void vsf_sysutil_sockaddr_clone(
   struct vsf_sysutil_sockaddr** p_sockptr,
   const struct vsf_sysutil_sockaddr* p_src);
@@ -242,8 +244,12 @@ const void* vsf_sysutil_sockaddr_ipv6_v4(
   const struct vsf_sysutil_sockaddr* p_sockaddr);
 const void* vsf_sysutil_sockaddr_ipv4_v6(
   const struct vsf_sysutil_sockaddr* p_sockaddr);
+void vsf_sysutil_sockaddr_set_un_path(struct vsf_sysutil_sockaddr* p_addr,
+                                      const struct mystr* path,
+                                      int is_private);
 int vsf_sysutil_get_ipv4_sock(void);
 int vsf_sysutil_get_ipv6_sock(void);
+int vsf_sysutil_get_unix_sock(void);
 struct vsf_sysutil_socketpair_retval
   vsf_sysutil_unix_stream_socketpair(void);
 int vsf_sysutil_bind(int fd, const struct vsf_sysutil_sockaddr* p_sockptr);

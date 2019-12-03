@@ -68,6 +68,7 @@ struct vsf_session
   /* Logging related details */
   int xferlog_fd;
   int vsftpd_log_fd;
+  int eventlog_fd;
   struct mystr remote_ip_str;
   unsigned long log_type;
   long log_start_sec;
