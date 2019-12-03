@@ -12,6 +12,32 @@ static void vsf_event_trigger(struct vsf_session* p_sess,
 static void vsf_event_clear(struct vsf_session* p_sess);
 static void vsf_event_log_err(struct vsf_session* p_sess, const char *msg);
 
+void vsf_event_idle_start(struct vsf_session* p_sess)
+{
+  struct mystr event_str = INIT_MYSTR;
+  unsigned long sec;
+
+  str_alloc_ulong(&event_str, vsf_sysutil_getppid());
+  str_append_text(&event_str, " ");
+  vsf_sysutil_get_monotonic_clock(&sec, 0);
+  str_append_ulong(&event_str, sec);
+  vsf_event_trigger(p_sess, kVSFEventIdleStart, &event_str);
+  str_free(&event_str);
+}
+
+void vsf_event_idle_stop(struct vsf_session* p_sess)
+{
+  struct mystr event_str = INIT_MYSTR;
+  unsigned long sec;
+
+  str_alloc_ulong(&event_str, vsf_sysutil_getppid());
+  str_append_text(&event_str, " ");
+  vsf_sysutil_get_monotonic_clock(&sec, 0);
+  str_append_ulong(&event_str, sec);
+  vsf_event_trigger(p_sess, kVSFEventIdleStop, &event_str);
+  str_free(&event_str);
+}
+
 void vsf_event_init(struct vsf_session* p_sess)
 {
   if (!tunable_events_enable)

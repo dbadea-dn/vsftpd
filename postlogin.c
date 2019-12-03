@@ -27,6 +27,7 @@
 #include "ssl.h"
 #include "vsftpver.h"
 #include "opts.h"
+#include "events.h"
 
 /* Private local functions */
 static void handle_pwd(struct vsf_session* p_sess);
@@ -120,6 +121,10 @@ process_post_login(struct vsf_session* p_sess)
     {
       vsf_sysutil_setproctitle("IDLE");
     }
+    if (tunable_events_enable)
+    {
+      vsf_event_idle_start(p_sess);
+    }
     /* Blocks */
     vsf_cmdio_get_cmd_and_arg(p_sess, &p_sess->ftp_cmd_str,
                               &p_sess->ftp_arg_str, 1);
@@ -136,6 +141,10 @@ process_post_login(struct vsf_session* p_sess)
       str_replace_unprintable(&proctitle_str, '?');
       vsf_sysutil_setproctitle_str(&proctitle_str);
       str_free(&proctitle_str);
+    }
+    if (tunable_events_enable)
+    {
+      vsf_event_idle_stop(p_sess);
     }
     /* Test command against the allowed lists.. */
     if (tunable_cmds_allowed)
