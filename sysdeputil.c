@@ -1355,3 +1355,16 @@ vsf_sysutil_getpid_nocache(void)
   return getpid();
 #endif
 }
+
+int
+vsf_sysutil_getppid(void)
+{
+#ifdef VSF_SYSDEP_HAVE_LINUX_CLONE
+  /* Need to defeat the glibc pid caching because we need to hit a raw
+   * sys_clone() above.
+   */
+  return syscall(__NR_getppid);
+#else
+  return getppid();
+#endif
+}

@@ -166,6 +166,7 @@ void vsf_sysutil_free(void* p_ptr);
 
 /* Process creation/exit/process handling */
 unsigned int vsf_sysutil_getpid(void);
+int vsf_sysutil_getppid(void);
 void vsf_sysutil_post_fork(void);
 int vsf_sysutil_fork(void);
 int vsf_sysutil_fork_failok(void);
