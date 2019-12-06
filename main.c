@@ -22,6 +22,7 @@
 #include "tcpwrap.h"
 #include "vsftpver.h"
 #include "ssl.h"
+#include "events.h"
 
 /*
  * Forward decls of helper functions
