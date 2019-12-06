@@ -28,6 +28,7 @@
 #include "sysdeputil.h"
 #include "sslslave.h"
 #include "seccompsandbox.h"
+#include "events.h"
 
 static void drop_all_privs(void);
 static void handle_sigchld(void* duff);
@@ -334,9 +335,17 @@ process_login_req(struct vsf_session* p_sess)
   {
     case kVSFLoginFail:
       priv_sock_send_result(p_sess->parent_fd, PRIV_SOCK_RESULT_BAD);
+      if (tunable_events_enable)
+      {
+        vsf_event_login_failed(p_sess);
+      }
       return;
       break;
     case kVSFLoginAnon:
+      if (tunable_events_enable)
+      {
+        vsf_event_login_successful(p_sess);
+      }
       str_free(&p_sess->user_str);
       if (tunable_ftp_username)
       {
@@ -347,6 +356,10 @@ process_login_req(struct vsf_session* p_sess)
     case kVSFLoginReal:
       {
         int do_chroot = 0;
+        if (tunable_events_enable)
+        {
+          vsf_event_login_successful(p_sess);
+        }
         if (tunable_chroot_local_user)
         {
           do_chroot = 1;

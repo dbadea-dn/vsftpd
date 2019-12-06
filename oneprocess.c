@@ -26,6 +26,7 @@
 #include "ptracesandbox.h"
 #include "ftppolicy.h"
 #include "seccompsandbox.h"
+#include "events.h"
 
 static void one_process_start(void* p_arg);
 
@@ -120,9 +121,17 @@ vsf_one_process_login(struct vsf_session* p_sess,
   switch (login_result)
   {
     case kVSFLoginFail:
+      if (tunable_events_enable)
+      {
+        vsf_event_login_failed(p_sess);
+      }
       return;
       break;
     case kVSFLoginAnon:
+      if (tunable_events_enable)
+      {
+        vsf_event_login_successful(p_sess);
+      }
       p_sess->is_anonymous = 1;
       process_post_login(p_sess);
       break;
