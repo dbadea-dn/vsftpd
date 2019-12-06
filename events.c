@@ -80,6 +80,69 @@ void vsf_event_login_failed(struct vsf_session* p_sess)
   str_free(&event_str);
 }
 
+void vsf_event_session_closed(struct vsf_session* p_sess)
+{
+  struct mystr event_str = INIT_MYSTR;
+  unsigned long sec;
+  unsigned short remote_port;
+
+  str_alloc_ulong(&event_str, vsf_sysutil_getppid());
+  str_append_text(&event_str, " ");
+  vsf_sysutil_get_monotonic_clock(&sec, 0);
+  str_append_ulong(&event_str, sec);
+  str_append_text(&event_str, " ");
+  str_append_str(&event_str, &p_sess->user_str);
+  str_append_text(&event_str, " ");
+  str_append_str(&event_str, &p_sess->remote_ip_str);
+  str_append_text(&event_str, " ");
+  remote_port = vsf_sysutil_sockaddr_get_port(p_sess->p_remote_addr);
+  str_append_ulong(&event_str, (unsigned long)remote_port);
+  vsf_event_trigger(p_sess, kVSFEventSessionClosed, &event_str);
+  str_free(&event_str);
+}
+
+void vsf_event_idle_session_timeout(struct vsf_session* p_sess)
+{
+  struct mystr event_str = INIT_MYSTR;
+  unsigned long sec;
+  unsigned short remote_port;
+
+  str_alloc_ulong(&event_str, vsf_sysutil_getppid());
+  str_append_text(&event_str, " ");
+  vsf_sysutil_get_monotonic_clock(&sec, 0);
+  str_append_ulong(&event_str, sec);
+  str_append_text(&event_str, " ");
+  str_append_str(&event_str, &p_sess->user_str);
+  str_append_text(&event_str, " ");
+  str_append_str(&event_str, &p_sess->remote_ip_str);
+  str_append_text(&event_str, " ");
+  remote_port = vsf_sysutil_sockaddr_get_port(p_sess->p_remote_addr);
+  str_append_ulong(&event_str, (unsigned long)remote_port);
+  vsf_event_trigger(p_sess, kVSFEventIdleSessionTimeout, &event_str);
+  str_free(&event_str);
+}
+
+void vsf_event_data_connection_timeout(struct vsf_session* p_sess)
+{
+  struct mystr event_str = INIT_MYSTR;
+  unsigned long sec;
+  unsigned short remote_port;
+
+  str_alloc_ulong(&event_str, vsf_sysutil_getppid());
+  str_append_text(&event_str, " ");
+  vsf_sysutil_get_monotonic_clock(&sec, 0);
+  str_append_ulong(&event_str, sec);
+  str_append_text(&event_str, " ");
+  str_append_str(&event_str, &p_sess->user_str);
+  str_append_text(&event_str, " ");
+  str_append_str(&event_str, &p_sess->remote_ip_str);
+  str_append_text(&event_str, " ");
+  remote_port = vsf_sysutil_sockaddr_get_port(p_sess->p_remote_addr);
+  str_append_ulong(&event_str, (unsigned long)remote_port);
+  vsf_event_trigger(p_sess, kVSFEventDataConnectionTimeout, &event_str);
+  str_free(&event_str);
+}
+
 void vsf_event_init(struct vsf_session* p_sess)
 {
   if (!tunable_events_enable)

@@ -19,6 +19,7 @@
 #include "logging.h"
 #include "session.h"
 #include "readwrite.h"
+#include "events.h"
 
 /* Internal functions */
 static int control_getline(struct mystr* p_str, struct vsf_session* p_sess);
@@ -87,6 +88,21 @@ vsf_cmdio_write_exit(struct vsf_session* p_sess, int status, const char* p_text,
   vsf_sysutil_shutdown_read_failok(VSFTP_COMMAND_FD);
   vsf_cmdio_write(p_sess, status, p_text);
   vsf_sysutil_shutdown_failok(VSFTP_COMMAND_FD);
+  if (tunable_events_enable)
+  {
+    if (p_sess->idle_timeout)
+    {
+      vsf_event_idle_session_timeout(p_sess);
+    }
+    else if (p_sess->data_timeout)
+    {
+      vsf_event_data_connection_timeout(p_sess);
+    }
+    else
+    {
+      vsf_event_session_closed(p_sess);
+    }
+  }
   vsf_sysutil_exit(exit_val);
 }
 
@@ -181,6 +197,10 @@ vsf_cmdio_get_cmd_and_arg(struct vsf_session* p_sess, struct mystr* p_cmd_str,
      * sure buggy clients don't ever see an OOPS message.
      */
     vsf_sysutil_shutdown_failok(VSFTP_COMMAND_FD);
+    if (tunable_events_enable)
+    {
+      vsf_event_session_closed(p_sess);
+    }
     vsf_sysutil_exit(1);
   }
   /* View a single space as a command of " ", which although a useless command,

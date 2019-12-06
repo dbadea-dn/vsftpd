@@ -10,6 +10,9 @@ enum EVSFEventType
   kVSFEventIdleStop,
   kVSFEventLoginSuccessful,
   kVSFEventLoginFailed,
+  kVSFEventSessionClosed,
+  kVSFEventIdleSessionTimeout,
+  kVSFEventDataConnectionTimeout,
 };
 
 void vsf_event_init(struct vsf_session* p_sess);
@@ -17,5 +20,8 @@ void vsf_event_idle_start(struct vsf_session* p_sess);
 void vsf_event_idle_stop(struct vsf_session* p_sess);
 void vsf_event_login_successful(struct vsf_session* p_sess);
 void vsf_event_login_failed(struct vsf_session* p_sess);
+void vsf_event_session_closed(struct vsf_session* p_sess);
+void vsf_event_idle_session_timeout(struct vsf_session* p_sess);
+void vsf_event_data_connection_timeout(struct vsf_session* p_sess);
 
 #endif
