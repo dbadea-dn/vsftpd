@@ -13,6 +13,8 @@ enum EVSFEventType
   kVSFEventSessionClosed,
   kVSFEventIdleSessionTimeout,
   kVSFEventDataConnectionTimeout,
+  kVSFEventMaxClientsReached,
+  kVSFEventMaxClientsReject,
 };
 
 void vsf_event_init(struct vsf_session* p_sess);
@@ -23,5 +25,7 @@ void vsf_event_login_failed(struct vsf_session* p_sess);
 void vsf_event_session_closed(struct vsf_session* p_sess);
 void vsf_event_idle_session_timeout(struct vsf_session* p_sess);
 void vsf_event_data_connection_timeout(struct vsf_session* p_sess);
+void vsf_event_max_clients_reached(struct vsf_session* p_sess);
+void vsf_event_max_clients_reject(struct vsf_session* p_sess);
 
 #endif

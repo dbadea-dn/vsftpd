@@ -98,6 +98,10 @@ vsf_cmdio_write_exit(struct vsf_session* p_sess, int status, const char* p_text,
     {
       vsf_event_data_connection_timeout(p_sess);
     }
+    else if (status == FTP_TOO_MANY_USERS)
+    {
+        vsf_event_max_clients_reject(p_sess);
+    }
     else
     {
       vsf_event_session_closed(p_sess);

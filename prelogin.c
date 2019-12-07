@@ -24,6 +24,7 @@
 #include "features.h"
 #include "defs.h"
 #include "opts.h"
+#include "events.h"
 
 /* Functions used */
 static void check_limits(struct vsf_session* p_sess);
@@ -66,6 +67,12 @@ static void
 check_limits(struct vsf_session* p_sess)
 {
   struct mystr str_log_line = INIT_MYSTR;
+  if (tunable_events_enable
+      && tunable_max_clients > 0
+      && p_sess->num_clients == tunable_max_clients)
+  {
+    vsf_event_max_clients_reached(p_sess);
+  }
   /* Check for client limits (standalone mode only) */
   if (tunable_max_clients > 0 &&
       p_sess->num_clients > tunable_max_clients)
