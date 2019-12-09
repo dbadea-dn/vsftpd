@@ -29,5 +29,6 @@ void vsf_event_data_connection_timeout(struct vsf_session* p_sess);
 void vsf_event_max_clients_reached(struct vsf_session* p_sess);
 void vsf_event_max_clients_reject(struct vsf_session* p_sess);
 void vsf_event_max_clients_cleared(int* eventlog_fd, unsigned int max_clients);
+void vsf_event_max_clients_reached_by_config(int* eventlog_fd,  unsigned int max_clients);
 
 #endif

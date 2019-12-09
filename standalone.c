@@ -273,10 +273,27 @@ handle_sigchld(void* duff)
 static void
 handle_sighup(void* duff)
 {
+  unsigned int old_max_clients;
   (void) duff;
+  old_max_clients = tunable_max_clients;
   /* We don't crash the out the listener if an invalid config was added */
   tunables_load_defaults();
   vsf_parseconf_load_file(0, 0);
+  /* clear max-clients reached when the limit is increased or removed */
+  if ((old_max_clients > 0)
+      && (s_children >= old_max_clients)
+      && ((tunable_max_clients == 0)
+          || (s_children < tunable_max_clients)))
+  {
+    vsf_event_max_clients_cleared(&eventlog_fd, tunable_max_clients);
+  }
+  /* signal max-clients event when the limit is decreased */
+  if ((tunable_max_clients > 0)
+      && (s_children >= tunable_max_clients))
+  {
+    vsf_event_max_clients_reached_by_config(
+      &eventlog_fd, tunable_max_clients);
+  }
 }
 
 static unsigned int

@@ -222,6 +222,55 @@ void vsf_event_max_clients_reject(struct vsf_session* p_sess)
   str_free(&event_str);
 }
 
+#define REMOTE_ADDR_MAX_CLIENTS_REACHED_BY_CONFIG "127.0.0.1 0"
+#define SESSION_ID_MAX_CLIENTS_REACHED_BY_CONFIG 0
+
+void vsf_event_max_clients_reached_by_config(int* eventlog_fd, unsigned int max_clients)
+{
+  int retval;
+  const int max_ulong_str_size = 32;
+  /* custom stack-based message allocation */
+  struct {
+    struct {
+      unsigned int type;
+      unsigned int length;
+    } header;
+    char payload[(max_ulong_str_size + 1)* 3 \
+                 + sizeof(REMOTE_ADDR_MAX_CLIENTS_REACHED_BY_CONFIG)];
+    char end[0];
+  } msg;
+  char *payload;
+  unsigned long sec;
+
+  vsf_sysutil_memclr(&msg, sizeof(msg));
+  msg.header.type = kVSFEventMaxClientsReached;
+  payload = msg.payload;
+  /* session id */
+  retval = snprintf(payload, max_ulong_str_size, "%lu",
+                    (unsigned long)SESSION_ID_MAX_CLIENTS_REACHED_BY_CONFIG);
+  payload += (retval > max_ulong_str_size)? max_ulong_str_size: retval;
+  *(payload++) = ' ';
+  /* uptime */
+  vsf_sysutil_get_monotonic_clock(&sec, 0);
+  retval = snprintf(payload, max_ulong_str_size, "%lu", sec);
+  payload += (retval > max_ulong_str_size)? max_ulong_str_size: retval;
+  *(payload++) = ' ';
+  /* max-clients limit */
+  retval = snprintf(payload, max_ulong_str_size, "%lu",
+                    (unsigned long)max_clients);
+  payload += (retval > max_ulong_str_size)? max_ulong_str_size: retval;
+  *(payload++) = ' ';
+  /* remote address */
+  payload += snprintf(payload, sizeof(REMOTE_ADDR_MAX_CLIENTS_REACHED_BY_CONFIG),
+                      REMOTE_ADDR_MAX_CLIENTS_REACHED_BY_CONFIG);
+  msg.header.length = payload - msg.payload;
+  retval = vsf_sysutil_write(*eventlog_fd, &msg,
+                             sizeof(msg.header) + msg.header.length + 1);
+  if (vsf_sysutil_retval_is_error(retval))
+  {
+    vsf_event_clear(eventlog_fd);
+  }
+}
 
 void vsf_event_init(int* eventlog_fd)
 {
