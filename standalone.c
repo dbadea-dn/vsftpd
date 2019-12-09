@@ -18,11 +18,14 @@
 #include "hash.h"
 #include "str.h"
 #include "ipaddrparse.h"
+#include "sysutil.h"
+#include "events.h"
 
 static unsigned int s_children;
 static struct hash* s_p_ip_count_hash;
 static struct hash* s_p_pid_ip_hash;
 static unsigned int s_ipaddr_size;
+static int eventlog_fd;
 
 static void handle_sigchld(void*  duff);
 static void handle_sighup(void*  duff);
@@ -136,6 +139,11 @@ vsf_standalone_main(void)
     die("could not listen");
   }
   vsf_sysutil_sockaddr_alloc(&p_accept_addr);
+  if (tunable_events_enable)
+  {
+    eventlog_fd = -1;
+    vsf_event_init(&eventlog_fd);
+  }
   while (1)
   {
     struct vsf_client_launch child_info;
@@ -252,6 +260,12 @@ handle_sigchld(void* duff)
         hash_lookup_entry(s_p_pid_ip_hash, (void*)&reap_one);
       drop_ip_count(p_ip);      
       hash_free_entry(s_p_pid_ip_hash, (void*)&reap_one);
+      if (tunable_events_enable
+          && tunable_max_clients > 0
+          && s_children == (tunable_max_clients-1))
+      {
+        vsf_event_max_clients_cleared(&eventlog_fd, tunable_max_clients);
+      }
     }
   }
 }

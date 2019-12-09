@@ -186,7 +186,7 @@ main(int argc, const char* argv[])
   vsf_log_init(&the_session);
   if (tunable_events_enable)
   {
-    vsf_event_init(&the_session);
+    vsf_event_init(&the_session.eventlog_fd);
   }
   str_alloc_text(&the_session.remote_ip_str,
                  vsf_sysutil_inet_ntop(the_session.p_remote_addr));
